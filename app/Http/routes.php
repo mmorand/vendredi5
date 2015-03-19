@@ -11,15 +11,8 @@
 |
 */
 
-Route::get('/', 'WelcomeController@index');
+Route::get('/', 'VendrediController@index');
 
-Route::get('home', 'HomeController@index');
+Route::get('select-game', 'VendrediController@selectGame');
 
-Route::controllers([
-	'auth' => 'Auth\AuthController',
-	'password' => 'Auth\PasswordController',
-]);
-
-/*App::missing(function($exception){
-	return view('404', [], 404);
-});*/
+Route::resource('game', 'GameController');

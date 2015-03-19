@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-class WelcomeController extends Controller {
+class VendrediController extends Controller {
 
 	/*
 	|--------------------------------------------------------------------------
@@ -20,7 +20,7 @@ class WelcomeController extends Controller {
 	 */
 	public function __construct()
 	{
-		$this->middleware('guest');
+
 	}
 
 	/**
@@ -30,7 +30,18 @@ class WelcomeController extends Controller {
 	 */
 	public function index()
 	{
-		return view('welcome');
+		return view('index');
 	}
 
+	/**
+	 * Show the page for selecting which slot you wanna play (1, 2 or 3)
+	 *
+	 * @return Response
+	 */
+	public function selectGame()
+	{
+		$game = new GameController();
+		$game->id = 1;
+		return view('selectGame')->with('game', $game);
+	}
 }
