@@ -4,6 +4,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use DB;
 
 class GameController extends Controller {
 
@@ -24,10 +25,19 @@ class GameController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index($id)
+	public function index()
 	{
-		//
-		return view('game')->with('id', $id);
+		// Display the template for selecting the game
+		$game_1 = DB::table('vendredi5_games')->where('game_slot', 1)->get();
+		$game_2 = DB::table('vendredi5_games')->where('game_slot', 2)->get();
+		$game_3 = DB::table('vendredi5_games')->where('game_slot', 3)->get();
+
+		return view('selectGame')
+			->with(array(
+				'game_1' => $game_1,
+				'game_2' => $game_2,
+				'game_3' => $game_3,
+			));
 	}
 
 	/**
