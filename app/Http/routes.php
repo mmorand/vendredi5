@@ -13,6 +13,10 @@
 
 Route::get('/', 'VendrediController@index');
 
-Route::get('select-game', array('as' => 'game.select', 'uses' => 'GameController@index') );
+Route::get('/select-game', array('as' => 'game.select', 'uses' => 'GameController@index') );
 
-Route::resource('game', 'GameController');
+Route::get('/game', array('as' => 'game.show', 'uses' => 'GameController@show') );
+
+Route::post('/game', array('as' => 'game.create', 'uses' => 'GameController@create') );
+
+//Route::resource('game', 'GameController');
