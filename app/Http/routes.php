@@ -11,12 +11,15 @@
 |
 */
 
-Route::get('/', 'VendrediController@index');
+// Get requests
+Route::get('/', 'GameController@home');
+Route::get('/select-game', array('as' => 'game.select', 'uses' => 'GameController@index'));
+Route::get('/game/{game_slot}', array('as' => 'game.show', 'uses' => 'GameController@show'));
 
-Route::get('/select-game', array('as' => 'game.select', 'uses' => 'GameController@index') );
+// Post requests
+Route::post('/game', array('as' => 'game.create', 'uses' => 'GameController@create'));
 
-Route::get('/game', array('as' => 'game.show', 'uses' => 'GameController@show') );
-
-Route::post('/game', array('as' => 'game.create', 'uses' => 'GameController@create') );
+// Delete requests
+Route::delete('/game/{game_slot}', array('as' => 'game.destroy', 'uses' => 'GameController@destroy'));
 
 //Route::resource('game', 'GameController');

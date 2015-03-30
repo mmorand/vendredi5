@@ -9,7 +9,7 @@ use App\Cards;
 use Illuminate\Http\Request;
 use DB;
 use Input;
-use Redirect;
+use Session;
 
 class GameController extends Controller {
 
@@ -33,6 +33,16 @@ class GameController extends Controller {
 	}
 
 	/**
+	 * Display the Homepage.
+	 *
+	 * @return Response
+	 */
+	public function home()
+	{
+		return view('index');
+	}
+
+	/**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
@@ -40,16 +50,15 @@ class GameController extends Controller {
 	public function index()
 	{
 		// Display the template for selecting the game
-		$game = array();
+		$games = array();
 
 		for ($i=1; $i < 4; $i++) { 
-			//$game[$i] = DB::table('vendredi5_games')->where('game_slot', $i)->get();
-			$game[$i] = Games::where('game_slot', $i)->get();
+			$games[$i] = Games::where('game_slot', $i)->get();
 		}
 
 		return view('selectGame')
 			->with(array(
-				'game' => $game,
+				'games' => $games,
 			));
 	}
 
@@ -61,18 +70,19 @@ class GameController extends Controller {
 	public function create()
 	{
 		$game_slot = Input::get('game_slot');
-		// Create a new game if slot is available
-		$is_slot_available = DB::table('vendredi5_games')->where('game_slot', $game_slot)->get();
 
-		if( empty($is_slot_available) ) {
+		// Create a new game if slot is available
+		$is_slot_available = Games::where('game_slot', $game_slot)->get();
+
+		if( $is_slot_available->isEmpty() ) {
 
 			// Create a new game on the given slot
 			// Le jeu commence à l'étape 1
 			$this->phase = 1;
 
 			// Mélanger les cartes vieillissement
-			$oldness_cards_hard = DB::table('vendredi5_cards')->where(array('type' => 'oldness', 'lvl_2' => 1))->get();
-			$oldness_cards_soft = DB::table('vendredi5_cards')->where(array('type' => 'oldness', 'lvl_2' => 0))->get();
+			$oldness_cards_hard = Cards::where(array('type' => 'oldness', 'lvl_2' => 1))->get();
+			$oldness_cards_soft = Cards::where(array('type' => 'oldness', 'lvl_2' => 0))->get();
 
 			$deck_och = array();
 			$deck_ocs = array();
@@ -86,7 +96,7 @@ class GameController extends Controller {
 			$this->deck_oldness = $deck_ocs . ', ' . $deck_och;
 
 			// Mélanger les cartes combat
-			$fighting_cards = DB::table('vendredi_cards')->where('type', 'fight')->get();
+			$fighting_cards = Cards::where('type', 'fight')->get();
 			$deck_fight = array();
 			foreach ($fighting_cards as $fight) { array_push($deck_fight, $fight->id); }
 			shuffle($deck_fight);
@@ -94,7 +104,7 @@ class GameController extends Controller {
 			$this->deck_fighting = implode(', ', $deck_fight);
 
 			// Mélanger les cartes danger
-			$danger_cards = DB::table('vendredi_cards')->where('type', 'danger')->get();
+			$danger_cards = Cards::where('type', 'danger')->get();
 			$deck_danger = array();
 			foreach ($danger_cards as $danger) { array_push($deck_danger, $danger->id); }
 			shuffle($deck_danger);
@@ -102,7 +112,7 @@ class GameController extends Controller {
 			$this->deck_dangers = implode(', ', $deck_danger);
 
 			// Mélanger et récupèrer deux pirates
-			$pirates_cards = DB::table('vendredi_cards')->where('type', 'pirate')->get();
+			$pirates_cards = Cards::where('type', 'pirate')->get();
 			$deck_pirates = array();
 			foreach ($pirates_cards as $pirate) { array_push($deck_pirates, $pirate->id); }
 			shuffle($deck_pirates);
@@ -113,9 +123,12 @@ class GameController extends Controller {
 			// Le joueur commence avec 20pts de vie
 			$this->lifepoints = 20;
 
+			$Game = new Games;
+
 			// Injection de la partie dans la Base de données
-			DB::table('vendredi_games')->insert(array(
+			$Game->create(array(
 				'status' 		=> 1,
+				'game_slot'		=> $game_slot,
 				'phase' 		=> $this->phase,
 				'lifepoints' 	=> $this->lifepoints,
 				'pirate_1' 		=> $this->pirate1,
@@ -128,11 +141,10 @@ class GameController extends Controller {
 			));
 
 			// Renvoie sur la page de jeu
-			return Redirect::to('game.show')->with('id', $game_slot);
+			return redirect('/game/'.$game_slot);
 
 		} else {
-			Session::flash('message', 'Sorry, this slot is unavailable. A game is in progress.');
-			return Redirect::to('game.select');
+			return redirect('/select-game');
 		}
 	}
 
@@ -152,10 +164,13 @@ class GameController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($game_slot)
 	{
+		$game = Games::where('game_slot', $game_slot)->firstOrFail();
+		$pirate1 = Cards::find($game->pirate_1);
+
 		// Display current game forgiven id
-		return view('game')->with('id', $id);
+		return view('game', compact('game', 'pirate1'));
 	}
 
 	/**
@@ -186,10 +201,12 @@ class GameController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
+	public function destroy($game_slot)
 	{
+		$game = Games::where('game_slot', $game_slot);
+		$game->delete();
 		//
-		return view('game')->with('id', $id);
+		return redirect('/select-game');
 	}
 
 }
