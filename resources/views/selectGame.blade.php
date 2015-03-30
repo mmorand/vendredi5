@@ -14,7 +14,7 @@
 					Jeu {{ $i }}
 				</div>
 
-				@if (!empty($game[$i]))
+				@unless (empty($game[$i]))
 					<div class="game-play">
 						{!! Form::open(array('route' => array('game.show', $game[$i]->id))) !!}
 							{!! Form::hidden('game_slot', $game[$i]->id) !!}

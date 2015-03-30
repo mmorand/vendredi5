@@ -3,6 +3,9 @@
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use App\Games;
+use App\Cards;
+
 use Illuminate\Http\Request;
 use DB;
 use Input;
@@ -40,7 +43,8 @@ class GameController extends Controller {
 		$game = array();
 
 		for ($i=1; $i < 4; $i++) { 
-			$game[$i] = DB::table('vendredi5_games')->where('game_slot', $i)->get();
+			//$game[$i] = DB::table('vendredi5_games')->where('game_slot', $i)->get();
+			$game[$i] = Games::where('game_slot', $i)->get();
 		}
 
 		return view('selectGame')
