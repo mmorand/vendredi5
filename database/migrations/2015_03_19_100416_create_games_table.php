@@ -25,6 +25,7 @@ class CreateGamesTable extends Migration {
 			$table->string('fighting');
 			$table->boolean('endgame')->default(0);
 			$table->tinyInteger('points')->default(0);
+			$table->timestamps();
 		});
 	}
 

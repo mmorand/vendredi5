@@ -5,8 +5,9 @@
 @stop
 
 @section('content')
-	<div class="title">Laravel 5</div>
-	<p>{{ $id or 'pas d\'identifiant'}}</p>
+
+	{!! HTML::image('img/cards/'.$pirate1->card_image, 'pirate 1', array('class' => 'horizontal-card inactive', 'id' => 'pirate-1')) !!}
 	<div class="quote">Bienvenue sur la version Laravel du jeu Vendredi de Friedmann Friese</div>
-	{!!HTML::linkAction('VendrediController@selectGame', 'New game', array(), array('class' => 'btn btn-success'))!!}
+	{!!HTML::linkAction('GameController@index', 'New game', array(), array('class' => 'btn btn-success'))!!}
+
 @stop
